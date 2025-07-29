@@ -1,0 +1,4 @@
+name = "dypage"
+main = "_worker.js"
+compatibility_date = "2025-07-29"
+keep_vars = true
