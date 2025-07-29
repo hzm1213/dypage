@@ -1,0 +1,56 @@
+name: Sync _worker.js from upstream
+
+on:
+  schedule:
+    - cron: '0 17 * * *'  # 每天 UTC 17 点（北京时间 1 AM）
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current repo
+        uses: actions/checkout@v4
+
+      - name: Fetch upstream file
+        run: |
+          curl -sL "https://raw.githubusercontent.com/yonggekkk/Cloudflare-vless-trojan/main/Vless_workers_pages/vless无需proxyip的nat64套壳版%20(推荐使用).js" -o new_worker.js
+
+      - name: Compare with existing _worker.js
+        id: compare
+        run: |
+          if [ ! -f _worker.js ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          elif ! cmp -s new_worker.js _worker.js; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Replace _worker.js and update wrangler.toml if changed
+        if: steps.compare.outputs.changed == 'true'
+        run: |
+          mv new_worker.js _worker.js
+          TODAY=$(date +%F)
+          if [ -f wrangler.toml ]; then
+            # 替换compatibility_date字段为当天日期
+            sed -i "s/^compatibility_date = \".*\"/compatibility_date = \"$TODAY\"/" wrangler.toml
+          else
+            # 文件不存在则新建一个
+            cat > wrangler.toml <<EOF
+name = "dypage"
+main = "_worker.js"
+compatibility_date = "$TODAY"
+keep_vars = true
+EOF
+          fi
+
+      - name: Commit and push if changed
+        if: steps.compare.outputs.changed == 'true'
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _worker.js wrangler.toml
+          git commit -m "🔄 Update _worker.js and wrangler.toml compatibility_date to $TODAY"
+          git push
