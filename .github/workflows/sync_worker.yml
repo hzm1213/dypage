@@ -34,11 +34,9 @@ jobs:
           mv new_worker.js _worker.js
           TODAY=$(date +%F)
           if [ -f wrangler.toml ]; then
-            # 替换compatibility_date字段为当天日期
             sed -i "s/^compatibility_date = \".*\"/compatibility_date = \"$TODAY\"/" wrangler.toml
           else
-            # 文件不存在则新建一个
-            cat > wrangler.toml <<EOF
+cat > wrangler.toml <<EOF
 name = "dypage"
 main = "_worker.js"
 compatibility_date = "$TODAY"
