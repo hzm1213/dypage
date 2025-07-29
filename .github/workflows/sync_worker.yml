@@ -2,7 +2,7 @@ name: Sync _worker.js from upstream
 
 on:
   schedule:
-    - cron: '0 17 * * *'  # 每天 UTC 17 点（北京时间 1 AM）
+    - cron: '0 1 * * *'  # 每天 UTC 17 点（北京时间 1 AM）
   workflow_dispatch:
 
 jobs:
@@ -36,12 +36,10 @@ jobs:
           if [ -f wrangler.toml ]; then
             sed -i "s/^compatibility_date = \".*\"/compatibility_date = \"$TODAY\"/" wrangler.toml
           else
-cat > wrangler.toml <<EOF
-name = "dypage"
-main = "_worker.js"
-compatibility_date = "$TODAY"
-keep_vars = true
-EOF
+            echo "name = \"dypage\"" > wrangler.toml
+            echo "main = \"_worker.js\"" >> wrangler.toml
+            echo "compatibility_date = \"$TODAY\"" >> wrangler.toml
+            echo "keep_vars = true" >> wrangler.toml
           fi
 
       - name: Commit and push if changed
