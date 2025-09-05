@@ -15,7 +15,7 @@ jobs:
 
       - name: Fetch upstream file
         run: |
-          curl -sL "https://raw.githubusercontent.com/yonggekkk/Cloudflare-vless-trojan/main/Vless_workers_pages/vless无需proxyip的nat64套壳版%20(推荐使用).js" -o new_worker.js
+          curl -sL "https://raw.githubusercontent.com/yonggekkk/Cloudflare-vless-trojan/main/Vless_workers_pages/Vless_workers_pages/nat64套壳版混淆.js" -o new_worker.js
 
       - name: Compare with existing _worker.js
         id: compare
